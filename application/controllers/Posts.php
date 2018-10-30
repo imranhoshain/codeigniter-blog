@@ -3,11 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Posts extends CI_Controller {
 
-	 public function __construct()
-	 {
-	  parent::__construct();
-	  $this->load->model('Post_Model');
-	 }
+	
 
 	public function index()
 	{
@@ -20,7 +16,7 @@ class Posts extends CI_Controller {
 		
 	}
 
-	public function view($slug= NULL)
+	public function view($slug = NULL)
 	{
 		$data['post'] = $this->Post_Model->get_posts($slug);
 
@@ -34,12 +30,21 @@ class Posts extends CI_Controller {
 	}
 
 	public function create()
-	{
-			
+	{			
 		$data['title'] = 'Create Post';
-		$this->load->view('templates/header');
-		$this->load->view('posts/create', $data);
-		$this->load->view('templates/footer');
+
+		$this->form_validation->set_rules('title', 'Title', 'required');
+		$this->form_validation->set_rules('body', 'Body', 'required');
+
+		if ($this->form_validation->run() === FALSE) {
+			$this->load->view('templates/header');
+			$this->load->view('posts/create', $data);
+			$this->load->view('templates/footer');
+		} else {
+			$this->Post_Model->create_post();
+			redirect('posts','refresh');
+		}
+		
 	}
 
 }
